@@ -65,19 +65,27 @@
                     <span class="badge badge-accent" id="cartBadge">0</span>
                 </button>
 
-                <!-- Role Specific Views -->
+                <!-- Role Specific Action Buttons -->
                 <button class="nav-link-btn vendor-btn" id="vendorNavBtn" onclick="switchView('vendor-dashboard')" style="display: none;">
-                    <i class="bi bi-speedometer2"></i> <span>Vendor Portal</span>
+                    <i class="bi bi-speedometer2"></i> <span>Seller Dashboard</span>
                 </button>
 
                 <button class="nav-link-btn admin-btn" id="adminNavBtn" onclick="switchView('admin-dashboard')" style="display: none;">
-                    <i class="bi bi-kanban"></i> <span>Admin Panel</span>
+                    <i class="bi bi-kanban"></i> <span>Admin Console</span>
+                </button>
+
+                <button class="nav-link-btn vendor-btn" id="sellerHubHeaderBtn" onclick="openPortalAuthModal('vendor')">
+                    <i class="bi bi-shop"></i> <span>Sell on Nexus</span>
+                </button>
+
+                <button class="nav-link-btn admin-btn" id="adminPortalHeaderBtn" onclick="openPortalAuthModal('admin')">
+                    <i class="bi bi-shield-lock"></i> <span>Admin Portal</span>
                 </button>
 
                 <!-- Auth Menu -->
                 <div class="user-menu" id="userMenu">
-                    <button class="btn btn-primary btn-sm" onclick="openAuthModal('login')">
-                        <i class="bi bi-box-arrow-in-right"></i> Login / Register
+                    <button class="btn btn-emerald btn-sm" onclick="openPortalAuthModal('customer')">
+                        <i class="bi bi-person-circle"></i> Customer Sign In
                     </button>
                 </div>
             </div>
@@ -569,75 +577,162 @@
 
     </main>
 
+    <!-- Site Footer with Dedicated Flipkart & Amazon Style Portals -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="brand-logo mb-3">
+                        <div class="logo-icon"><i class="bi bi-cart4"></i></div>
+                        <div class="logo-text">Nexus<span>Market</span></div>
+                    </div>
+                    <p class="text-xs text-muted">Next-Generation Multi-Vendor E-Commerce Ecosystem with Razorpay INR payments & separate role portals.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Customer Shopping Portal</h4>
+                    <ul class="footer-links">
+                        <li><button onclick="openPortalAuthModal('customer')"><i class="bi bi-person"></i> Customer Sign In</button></li>
+                        <li><button onclick="switchView('shop')"><i class="bi bi-grid"></i> Product Catalog</button></li>
+                        <li><button onclick="openWishlistModal()"><i class="bi bi-heart"></i> Saved Wishlist</button></li>
+                        <li><button onclick="switchView('orders')"><i class="bi bi-receipt"></i> My Orders</button></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Seller Hub (Vendors)</h4>
+                    <ul class="footer-links">
+                        <li><button onclick="openPortalAuthModal('vendor')"><i class="bi bi-shop"></i> Sell on NexusMarket (Seller Login)</button></li>
+                        <li><button onclick="switchView('vendor-profile')"><i class="bi bi-speedometer2"></i> Seller Dashboard</button></li>
+                        <li><button onclick="openPortalAuthModal('vendor', 'register')"><i class="bi bi-plus-circle"></i> Register Storefront</button></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Platform Executive Console</h4>
+                    <ul class="footer-links">
+                        <li><button onclick="openPortalAuthModal('admin')"><i class="bi bi-shield-lock"></i> Executive Admin Sign In</button></li>
+                        <li><button onclick="switchView('admin-profile')"><i class="bi bi-kanban"></i> Executive Governance</button></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 NexusMarket Multi-Vendor Platform. Powered by Python FastAPI & Razorpay INR Engine.</p>
+            </div>
+        </div>
+    </footer>
+
     <!-- MODAL OVERLAYS -->
 
-    <!-- Auth Modal -->
-    <div class="modal-backdrop" id="authModal">
-        <div class="modal-card">
-            <button class="modal-close" onclick="closeModal('authModal')"><i class="bi bi-x-lg"></i></button>
+    <!-- 1. Customer Dedicated Auth Portal Modal -->
+    <div class="modal-backdrop" id="customerAuthModal">
+        <div class="modal-card portal-modal-cust">
+            <button class="modal-close" onclick="closeModal('customerAuthModal')"><i class="bi bi-x-lg"></i></button>
+            <div class="text-center mb-3">
+                <span class="portal-header-badge badge-emerald"><i class="bi bi-bag-check-fill"></i> Customer Shopping Portal</span>
+                <h3>Customer Sign In & Register</h3>
+                <p class="text-xs text-muted">Shop products, track orders, manage wishlist & Razorpay checkout like Flipkart & Amazon.</p>
+            </div>
             <div class="auth-tabs">
-                <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</button>
-                <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</button>
-                <button class="auth-tab" id="tabForgot" onclick="switchAuthTab('forgot')">Reset Pwd</button>
+                <button class="auth-tab active" id="tabCustLogin" onclick="switchCustTab('login')">Customer Login</button>
+                <button class="auth-tab" id="tabCustReg" onclick="switchCustTab('register')">New Customer</button>
             </div>
 
-            <form id="loginForm" class="auth-form active" onsubmit="handleLoginSubmit(event)">
-                <div class="role-portal-selector">
-                    <button type="button" class="role-portal-btn active" id="portalCustomerBtn" onclick="selectLoginPortal('customer')">
-                        <i class="bi bi-person"></i> Customer
-                    </button>
-                    <button type="button" class="role-portal-btn" id="portalVendorBtn" onclick="selectLoginPortal('vendor')">
-                        <i class="bi bi-shop"></i> Seller Hub
-                    </button>
-                    <button type="button" class="role-portal-btn" id="portalAdminBtn" onclick="selectLoginPortal('admin')">
-                        <i class="bi bi-shield-check"></i> Admin Portal
-                    </button>
-                </div>
+            <form id="custLoginForm" class="auth-form active" onsubmit="handleCustLoginSubmit(event)">
                 <div class="form-group">
-                    <label id="loginEmailLabel">Email Address (Customer Portal)</label>
-                    <input type="email" id="loginEmail" required placeholder="customer@gmail.com" class="form-input">
+                    <label>Customer Email</label>
+                    <input type="email" id="custLoginEmail" required value="customer@gmail.com" class="form-input">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="loginPassword" required placeholder="••••••••" class="form-input">
+                    <input type="password" id="custLoginPassword" required value="customer123" class="form-input">
                 </div>
-                <button type="submit" class="btn btn-primary btn-block" id="loginSubmitBtn"><i class="bi bi-box-arrow-in-right"></i> Log In to Customer Portal</button>
+                <button type="submit" class="btn btn-emerald btn-block"><i class="bi bi-box-arrow-in-right"></i> Log In to Customer Portal</button>
             </form>
 
-            <form id="registerForm" class="auth-form" onsubmit="handleRegisterSubmit(event)">
+            <form id="custRegForm" class="auth-form" onsubmit="handleCustRegisterSubmit(event)">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" id="regName" required placeholder="John Doe" class="form-input">
+                    <input type="text" id="custRegName" required placeholder="John Doe" class="form-input">
                 </div>
                 <div class="form-group">
                     <label>Email Address</label>
-                    <input type="email" id="regEmail" required placeholder="john@example.com" class="form-input">
+                    <input type="email" id="custRegEmail" required placeholder="john@example.com" class="form-input">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="regPassword" required placeholder="••••••••" class="form-input">
+                    <input type="password" id="custRegPassword" required placeholder="••••••••" class="form-input">
+                </div>
+                <button type="submit" class="btn btn-emerald btn-block"><i class="bi bi-person-plus"></i> Create Customer Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. Vendor / Seller Central Dedicated Auth Portal Modal -->
+    <div class="modal-backdrop" id="vendorAuthModal">
+        <div class="modal-card portal-modal-vendor">
+            <button class="modal-close" onclick="closeModal('vendorAuthModal')"><i class="bi bi-x-lg"></i></button>
+            <div class="text-center mb-3">
+                <span class="portal-header-badge badge-indigo"><i class="bi bi-shop"></i> Flipkart / Amazon Seller Central Hub</span>
+                <h3>Seller Central Vendor Login</h3>
+                <p class="text-xs text-muted">Manage your store products, fulfill order line items, view earnings (₹) & ratings.</p>
+            </div>
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabVendorLogin" onclick="switchVendorTab('login')">Seller Login</button>
+                <button class="auth-tab" id="tabVendorReg" onclick="switchVendorTab('register')">Register New Store</button>
+            </div>
+
+            <form id="vendorLoginForm" class="auth-form active" onsubmit="handleVendorLoginSubmit(event)">
+                <div class="form-group">
+                    <label>Seller Account Email</label>
+                    <input type="email" id="vendorLoginEmail" required value="vendor1@technexus.com" class="form-input">
                 </div>
                 <div class="form-group">
-                    <label>Account Role</label>
-                    <select id="regRole" class="form-select" onchange="toggleStoreNameInput()">
-                        <option value="customer">Customer (Shop & Buy)</option>
-                        <option value="vendor">Vendor (Sell Products)</option>
-                    </select>
+                    <label>Password</label>
+                    <input type="password" id="vendorLoginPassword" required value="vendor123" class="form-input">
                 </div>
-                <div class="form-group" id="storeNameGroup" style="display: none;">
-                    <label>Vendor Store Name</label>
-                    <input type="text" id="regStoreName" placeholder="My Awesome Store" class="form-input">
-                </div>
-                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-person-plus"></i> Create Account</button>
+                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-shop"></i> Log In to Seller Hub</button>
             </form>
 
-            <form id="forgotForm" class="auth-form" onsubmit="handleForgotSubmit(event)">
-                <p class="text-sm text-muted mb-3">Enter your registered email address to generate a password reset token.</p>
+            <form id="vendorRegForm" class="auth-form" onsubmit="handleVendorRegisterSubmit(event)">
                 <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="forgotEmail" required placeholder="name@example.com" class="form-input">
+                    <label>Seller / Owner Name</label>
+                    <input type="text" id="vRegName" required placeholder="Jane Smith" class="form-input">
                 </div>
-                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-key"></i> Request Reset Token</button>
+                <div class="form-group">
+                    <label>Store Display Name</label>
+                    <input type="text" id="vRegStore" required placeholder="Nexus Electronics Store" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Business Email</label>
+                    <input type="email" id="vRegEmail" required placeholder="seller@store.com" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="vRegPassword" required placeholder="••••••••" class="form-input">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-shop-window"></i> Register Vendor Storefront</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. Executive Admin Dedicated Auth Portal Modal -->
+    <div class="modal-backdrop" id="adminAuthModal">
+        <div class="modal-card portal-modal-admin">
+            <button class="modal-close" onclick="closeModal('adminAuthModal')"><i class="bi bi-x-lg"></i></button>
+            <div class="text-center mb-3">
+                <span class="portal-header-badge badge-amber"><i class="bi bi-shield-lock-fill"></i> Platform Executive Control</span>
+                <h3>Executive Admin Console Sign In</h3>
+                <p class="text-xs text-muted">Restricted portal for super administrators, GMV analytics, 10% commission & vendor approvals.</p>
+            </div>
+
+            <form id="adminLoginForm" class="auth-form active" onsubmit="handleAdminLoginSubmit(event)">
+                <div class="form-group">
+                    <label>Executive Admin Email</label>
+                    <input type="email" id="adminLoginEmail" required value="admin@ecommerce.com" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="adminLoginPassword" required value="admin123" class="form-input">
+                </div>
+                <button type="submit" class="btn btn-block" style="background:#f59e0b; color:#0b0f19; font-weight:700;"><i class="bi bi-shield-check"></i> Sign In to Executive Console</button>
             </form>
         </div>
     </div>

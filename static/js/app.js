@@ -1209,77 +1209,121 @@ function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
 function openAuthModal(tab = 'login') {
-    switchAuthTab(tab);
-    openModal('authModal');
+    openPortalAuthModal('customer', tab);
 }
 
-function switchAuthTab(tab) {
-    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+// Dedicated Portal Auth Modals Helper (Flipkart & Amazon Style)
+function openPortalAuthModal(portalRole, tab = 'login') {
+    closeModal('customerAuthModal');
+    closeModal('vendorAuthModal');
+    closeModal('adminAuthModal');
 
-    if (tab === 'login') {
-        document.getElementById('tabLogin').classList.add('active');
-        document.getElementById('loginForm').classList.add('active');
-    } else if (tab === 'register') {
-        document.getElementById('tabRegister').classList.add('active');
-        document.getElementById('registerForm').classList.add('active');
-    } else if (tab === 'forgot') {
-        document.getElementById('tabForgot').classList.add('active');
-        document.getElementById('forgotForm').classList.add('active');
+    if (portalRole === 'customer') {
+        switchCustTab(tab);
+        openModal('customerAuthModal');
+    } else if (portalRole === 'vendor') {
+        switchVendorTab(tab);
+        openModal('vendorAuthModal');
+    } else if (portalRole === 'admin') {
+        openModal('adminAuthModal');
     }
 }
 
-function toggleStoreNameInput() {
-    const role = document.getElementById('regRole').value;
-    document.getElementById('storeNameGroup').style.display = role === 'vendor' ? 'block' : 'none';
+function switchCustTab(tab) {
+    const custCard = document.getElementById('customerAuthModal');
+    if (!custCard) return;
+    custCard.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    custCard.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+
+    if (tab === 'login') {
+        document.getElementById('tabCustLogin').classList.add('active');
+        document.getElementById('custLoginForm').classList.add('active');
+    } else {
+        document.getElementById('tabCustReg').classList.add('active');
+        document.getElementById('custRegForm').classList.add('active');
+    }
 }
 
-async function handleLoginSubmit(e) {
-    e.preventDefault();
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    await quickLogin(email, password);
-    closeModal('authModal');
+function switchVendorTab(tab) {
+    const vendorCard = document.getElementById('vendorAuthModal');
+    if (!vendorCard) return;
+    vendorCard.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    vendorCard.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+
+    if (tab === 'login') {
+        document.getElementById('tabVendorLogin').classList.add('active');
+        document.getElementById('vendorLoginForm').classList.add('active');
+    } else {
+        document.getElementById('tabVendorReg').classList.add('active');
+        document.getElementById('vendorRegForm').classList.add('active');
+    }
 }
 
-async function handleRegisterSubmit(e) {
+async function handleCustLoginSubmit(e) {
     e.preventDefault();
-    const name = document.getElementById('regName').value;
-    const email = document.getElementById('regEmail').value;
-    const password = document.getElementById('regPassword').value;
-    const role = document.getElementById('regRole').value;
-    const storeName = document.getElementById('regStoreName').value;
+    const email = document.getElementById('custLoginEmail').value;
+    const password = document.getElementById('custLoginPassword').value;
+    await quickLogin(email, password, 'customer');
+    closeModal('customerAuthModal');
+}
+
+async function handleCustRegisterSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('custRegName').value;
+    const email = document.getElementById('custRegEmail').value;
+    const password = document.getElementById('custRegPassword').value;
 
     const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, full_name: name, role, store_name: storeName })
+        body: JSON.stringify({ email, password, full_name: name, role: 'customer' })
     });
 
     if (res.ok) {
-        showToast('Registration successful! Please log in.', 'success');
-        switchAuthTab('login');
+        showToast('Customer account created! Logging in...', 'success');
+        await quickLogin(email, password, 'customer');
+        closeModal('customerAuthModal');
     } else {
         const err = await res.json();
         showToast(err.detail || 'Registration failed', 'error');
     }
 }
 
-async function handleForgotSubmit(e) {
+async function handleVendorLoginSubmit(e) {
     e.preventDefault();
-    const email = document.getElementById('forgotEmail').value;
-    const res = await fetch('/api/auth/forgot-password', {
+    const email = document.getElementById('vendorLoginEmail').value;
+    const password = document.getElementById('vendorLoginPassword').value;
+    await quickLogin(email, password, 'vendor');
+    closeModal('vendorAuthModal');
+}
+
+async function handleVendorRegisterSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('vRegName').value;
+    const storeName = document.getElementById('vRegStore').value;
+    const email = document.getElementById('vRegEmail').value;
+    const password = document.getElementById('vRegPassword').value;
+
+    const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, password, full_name: name, role: 'vendor', store_name: storeName })
     });
 
     if (res.ok) {
-        const data = await res.json();
-        showToast(`Reset code generated: ${data.reset_token}`, 'success');
-        alert(`Reset Token for ${email}: ${data.reset_token}`);
-        switchAuthTab('login');
+        showToast('Seller Storefront created! Logging in to Seller Central...', 'success');
+        await quickLogin(email, password, 'vendor');
+        closeModal('vendorAuthModal');
     } else {
-        showToast('Email not found', 'error');
+        const err = await res.json();
+        showToast(err.detail || 'Vendor registration failed', 'error');
     }
+}
+
+async function handleAdminLoginSubmit(e) {
+    e.preventDefault();
+    const email = document.getElementById('adminLoginEmail').value;
+    const password = document.getElementById('adminLoginPassword').value;
+    await quickLogin(email, password, 'admin');
+    closeModal('adminAuthModal');
 }
