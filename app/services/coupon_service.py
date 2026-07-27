@@ -38,7 +38,7 @@ class CouponService:
         if req.cart_total < coupon.min_order_amount:
             raise HTTPException(
                 status_code=400,
-                detail=f"Cart total must be at least ${coupon.min_order_amount:.2f} for this coupon"
+                detail=f"Cart total must be at least ₹{coupon.min_order_amount:.2f} for this coupon"
             )
 
         if coupon.vendor_id and req.vendor_ids:

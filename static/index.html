@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusMarket - Multi-Vendor E-Commerce Platform</title>
-    <meta name="description" content="Next-generation multi-vendor e-commerce platform powered by Python FastAPI, JWT Auth, and modern frontend architecture.">
+    <title>NexusMarket - Multi-Vendor E-Commerce Platform (Razorpay INR)</title>
+    <meta name="description" content="Next-generation multi-vendor e-commerce platform powered by Python FastAPI, JWT Auth, Razorpay Payment Gateway, and modern frontend architecture.">
     <!-- Google Fonts & Bootstrap Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,7 +16,7 @@
     <!-- Top Demo Navigation Bar -->
     <div class="demo-banner">
         <div class="container demo-banner-content">
-            <span class="demo-badge"><i class="bi bi-lightning-charge-fill"></i> Interactive Demo Mode</span>
+            <span class="demo-badge"><i class="bi bi-lightning-charge-fill"></i> Interactive Razorpay Payment Demo</span>
             <span class="demo-label">Quick Role Login:</span>
             <div class="demo-buttons">
                 <button class="btn btn-sm btn-outline" onclick="quickLogin('customer@gmail.com', 'customer123')">
@@ -92,13 +92,13 @@
             <!-- Hero Banner -->
             <div class="hero-card">
                 <div class="hero-content">
-                    <span class="hero-subtitle"><i class="bi bi-stars"></i> Premier Multi-Vendor Ecosystem</span>
+                    <span class="hero-subtitle"><i class="bi bi-stars"></i> Premier Multi-Vendor Ecosystem (INR ₹)</span>
                     <h1 class="hero-title">Discover Quality Products Direct From Verified Global Vendors</h1>
-                    <p class="hero-desc">Explore electronics, fashion, and home goods with multi-vendor cart checkout, verified customer reviews, and instant order tracking.</p>
+                    <p class="hero-desc">Explore electronics, fashion, and home goods with multi-vendor cart checkout, verified customer reviews, and integrated Razorpay payments in Rupees (₹).</p>
                     <div class="hero-stats">
                         <div class="stat-pill"><strong id="heroVendorCount">2+</strong> Active Vendors</div>
                         <div class="stat-pill"><strong id="heroProductCount">5+</strong> Curated Items</div>
-                        <div class="stat-pill"><strong>100%</strong> Secured Mock Payments</div>
+                        <div class="stat-pill"><strong>100%</strong> Secured Razorpay Integration</div>
                     </div>
                 </div>
             </div>
@@ -122,10 +122,10 @@
                     </div>
                     <div class="filter-controls">
                         <select id="priceFilter" onchange="filterProducts()" class="form-select">
-                            <option value="">All Price Ranges</option>
-                            <option value="0-100">Under $100</option>
-                            <option value="100-200">$100 - $200</option>
-                            <option value="200-500">$200+</option>
+                            <option value="">All Price Ranges (INR)</option>
+                            <option value="0-5000">Under ₹5,000</option>
+                            <option value="5000-10000">₹5,000 - ₹10,000</option>
+                            <option value="10000-50000">₹10,000+</option>
                         </select>
                     </div>
                 </div>
@@ -139,7 +139,7 @@
         <section id="ordersView" class="view-section">
             <div class="section-header">
                 <h2><i class="bi bi-receipt"></i> My Order History</h2>
-                <p class="text-muted">Track your recent orders, line item statuses, and payment details.</p>
+                <p class="text-muted">Track your recent orders, line item statuses, and Razorpay payment receipts in Rupees (₹).</p>
             </div>
             <div id="ordersList" class="orders-container">
                 <!-- Loaded dynamically -->
@@ -151,7 +151,7 @@
             <div class="dashboard-header flex-between">
                 <div>
                     <h2><i class="bi bi-shop"></i> Vendor Storefront Dashboard</h2>
-                    <p class="text-muted" id="vendorStoreName">Manage store inventory, view sales earnings, and fulfill order line items.</p>
+                    <p class="text-muted" id="vendorStoreName">Manage store inventory, view sales earnings (₹), and fulfill order line items.</p>
                 </div>
                 <button class="btn btn-primary" onclick="openAddProductModal()">
                     <i class="bi bi-plus-lg"></i> Add New Product
@@ -161,10 +161,10 @@
             <!-- Vendor Metrics Cards -->
             <div class="stats-grid">
                 <div class="stat-card glass">
-                    <div class="stat-icon icon-emerald"><i class="bi bi-currency-dollar"></i></div>
+                    <div class="stat-icon icon-emerald"><i class="bi bi-currency-rupee"></i></div>
                     <div class="stat-info">
                         <span class="stat-label">Total Store Sales</span>
-                        <h3 id="vendorTotalSales">$0.00</h3>
+                        <h3 id="vendorTotalSales">₹0.00</h3>
                     </div>
                 </div>
 
@@ -196,7 +196,7 @@
                             <tr>
                                 <th>Product</th>
                                 <th>Category</th>
-                                <th>Price</th>
+                                <th>Price (₹)</th>
                                 <th>Stock</th>
                                 <th>Rating</th>
                                 <th>Status</th>
@@ -221,7 +221,7 @@
                                 <th>Order #</th>
                                 <th>Product</th>
                                 <th>Qty</th>
-                                <th>Total</th>
+                                <th>Total (₹)</th>
                                 <th>Fulfillment Address</th>
                                 <th>Status</th>
                                 <th>Update Status</th>
@@ -237,7 +237,7 @@
         <section id="adminView" class="view-section">
             <div class="dashboard-header">
                 <h2><i class="bi bi-shield-lock-fill"></i> Platform Executive Admin Panel</h2>
-                <p class="text-muted">Global analytics, vendor approval workflow, platform commission, and coupon management.</p>
+                <p class="text-muted">Global analytics in Indian Rupees (₹), vendor approval workflow, platform commission, and coupon management.</p>
             </div>
 
             <!-- Admin Stats Cards -->
@@ -246,7 +246,7 @@
                     <div class="stat-icon icon-emerald"><i class="bi bi-graph-up-arrow"></i></div>
                     <div class="stat-info">
                         <span class="stat-label">Platform Gross Volume (GMV)</span>
-                        <h3 id="adminGMV">$0.00</h3>
+                        <h3 id="adminGMV">₹0.00</h3>
                     </div>
                 </div>
 
@@ -254,7 +254,7 @@
                     <div class="stat-icon icon-violet"><i class="bi bi-pie-chart-fill"></i></div>
                     <div class="stat-info">
                         <span class="stat-label">Platform Commission (10%)</span>
-                        <h3 id="adminCommission">$0.00</h3>
+                        <h3 id="adminCommission">₹0.00</h3>
                     </div>
                 </div>
 
@@ -288,7 +288,7 @@
                                 <th>Store Name</th>
                                 <th>Owner Email</th>
                                 <th>Products</th>
-                                <th>Total Sales</th>
+                                <th>Total Sales (₹)</th>
                                 <th>Status</th>
                                 <th>Moderate Action</th>
                             </tr>
@@ -313,7 +313,7 @@
                                 <th>Code</th>
                                 <th>Type</th>
                                 <th>Discount</th>
-                                <th>Min Purchase</th>
+                                <th>Min Purchase (₹)</th>
                                 <th>Uses</th>
                                 <th>Target</th>
                                 <th>Status</th>
@@ -329,7 +329,7 @@
 
     <!-- MODAL OVERLAYS -->
 
-    <!-- Auth Modal (Login / Register / Forgot Password) -->
+    <!-- Auth Modal -->
     <div class="modal-backdrop" id="authModal">
         <div class="modal-card">
             <button class="modal-close" onclick="closeModal('authModal')"><i class="bi bi-x-lg"></i></button>
@@ -339,7 +339,6 @@
                 <button class="auth-tab" id="tabForgot" onclick="switchAuthTab('forgot')">Reset Pwd</button>
             </div>
 
-            <!-- Login Form -->
             <form id="loginForm" class="auth-form active" onsubmit="handleLoginSubmit(event)">
                 <div class="form-group">
                     <label>Email Address</label>
@@ -352,7 +351,6 @@
                 <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-box-arrow-in-right"></i> Log In</button>
             </form>
 
-            <!-- Register Form -->
             <form id="registerForm" class="auth-form" onsubmit="handleRegisterSubmit(event)">
                 <div class="form-group">
                     <label>Full Name</label>
@@ -380,14 +378,13 @@
                 <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-person-plus"></i> Create Account</button>
             </form>
 
-            <!-- Forgot Password Form -->
             <form id="forgotForm" class="auth-form" onsubmit="handleForgotSubmit(event)">
-                <p class="text-sm text-muted mb-3">Enter your registered email address to generate a password reset authorization code.</p>
+                <p class="text-sm text-muted mb-3">Enter your registered email address to generate a password reset token.</p>
                 <div class="form-group">
                     <label>Email Address</label>
                     <input type="email" id="forgotEmail" required placeholder="name@example.com" class="form-input">
                 </div>
-                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-key"></i> Request Reset Code</button>
+                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-key"></i> Request Reset Token</button>
             </form>
         </div>
     </div>
@@ -421,18 +418,18 @@
 
                 <div class="cart-summary-line">
                     <span>Subtotal:</span>
-                    <strong id="cartSubtotal">$0.00</strong>
+                    <strong id="cartSubtotal">₹0.00</strong>
                 </div>
                 <div class="cart-summary-line text-emerald" id="discountLine" style="display: none;">
                     <span>Discount:</span>
-                    <strong id="cartDiscount">-$0.00</strong>
+                    <strong id="cartDiscount">-₹0.00</strong>
                 </div>
                 <div class="cart-summary-line total-line">
                     <span>Total Amount:</span>
-                    <strong id="cartTotal">$0.00</strong>
+                    <strong id="cartTotal">₹0.00</strong>
                 </div>
                 <button class="btn btn-primary btn-block btn-lg mt-3" onclick="openCheckoutModal()">
-                    <i class="bi bi-shield-check"></i> Proceed to Mock Checkout
+                    <i class="bi bi-shield-check"></i> Pay via Razorpay (INR ₹)
                 </button>
             </div>
         </div>
@@ -449,37 +446,43 @@
         </div>
     </div>
 
-    <!-- Checkout & Mock Payment Gateway Modal -->
+    <!-- Razorpay Payment Gateway Modal -->
     <div class="modal-backdrop" id="checkoutModal">
         <div class="modal-card">
             <button class="modal-close" onclick="closeModal('checkoutModal')"><i class="bi bi-x-lg"></i></button>
-            <h3><i class="bi bi-credit-card"></i> Mock Payment Gateway</h3>
-            <p class="text-muted text-sm">Simulate end-to-end multi-vendor order payment processing.</p>
+            <div class="razorpay-header text-center mb-3">
+                <div class="razorpay-logo mb-2">
+                    <span class="badge badge-accent" style="font-size:0.9rem; padding:6px 14px;"><i class="bi bi-lightning-charge-fill"></i> Razorpay Secured</span>
+                </div>
+                <h3>Razorpay Payment Gateway</h3>
+                <p class="text-muted text-sm">Instant payment in Indian Rupees (₹) via UPI, Cards, NetBanking, or Wallet.</p>
+            </div>
 
-            <form id="checkoutForm" onsubmit="handlePaymentSubmit(event)" class="mt-3">
+            <form id="checkoutForm" onsubmit="handlePaymentSubmit(event)">
                 <div class="form-group">
-                    <label>Shipping Address</label>
-                    <textarea id="checkoutAddress" required class="form-input" rows="2" placeholder="123 Innovation Way, Suite 400, NY 10001"></textarea>
+                    <label>Delivery Address</label>
+                    <textarea id="checkoutAddress" required class="form-input" rows="2" placeholder="MG Road, Indiranagar, Bengaluru, Karnataka 560038"></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label>Payment Method</label>
+                    <label>Razorpay Payment Method</label>
                     <select id="paymentMethod" class="form-select">
-                        <option value="mock_card">Credit / Debit Card (Mock)</option>
-                        <option value="mock_upi">Instant UPI Transfer (Mock)</option>
-                        <option value="mock_paypal">PayPal Direct (Mock)</option>
+                        <option value="razorpay_upi">Razorpay UPI (Google Pay / PhonePe / Paytm / BHIM)</option>
+                        <option value="razorpay_card">Razorpay Debit / Credit Cards (Visa, Mastercard, RuPay)</option>
+                        <option value="razorpay_netbanking">Razorpay Net Banking (SBI, HDFC, ICICI, Axis)</option>
+                        <option value="razorpay_wallet">Razorpay Wallet (Paytm, Mobikwik, Amazon Pay)</option>
                     </select>
                 </div>
 
-                <div class="checkout-summary-box">
+                <div class="checkout-summary-box card p-3 glass my-3">
                     <div class="flex-between">
-                        <span>Final Order Total:</span>
-                        <strong id="checkoutFinalTotal" class="text-lg text-indigo">$0.00</strong>
+                        <span>Total Payable (INR):</span>
+                        <strong id="checkoutFinalTotal" class="text-xl text-emerald">₹0.00</strong>
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-emerald btn-block btn-lg mt-3" id="payBtn">
-                    <i class="bi bi-lock-fill"></i> Pay Now & Place Order
+                <button type="submit" class="btn btn-emerald btn-block btn-lg" id="payBtn">
+                    <i class="bi bi-lock-fill"></i> Pay Now via Razorpay (₹)
                 </button>
             </form>
         </div>
@@ -501,8 +504,8 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group col">
-                        <label>Price ($)</label>
-                        <input type="number" step="0.01" id="prodPrice" required placeholder="99.99" class="form-input">
+                        <label>Price (₹)</label>
+                        <input type="number" step="0.01" id="prodPrice" required placeholder="3999" class="form-input">
                     </div>
                     <div class="form-group col">
                         <label>Stock Qty</label>
@@ -530,25 +533,25 @@
             <form id="createCouponForm" onsubmit="handleCreateCouponSubmit(event)" class="mt-3">
                 <div class="form-group">
                     <label>Coupon Code</label>
-                    <input type="text" id="coupCode" required placeholder="SUMMER25" class="form-input uppercase">
+                    <input type="text" id="coupCode" required placeholder="RAZOR500" class="form-input uppercase">
                 </div>
                 <div class="form-row">
                     <div class="form-group col">
                         <label>Discount Type</label>
                         <select id="coupType" class="form-select">
                             <option value="percent">Percentage (%)</option>
-                            <option value="fixed">Fixed Amount ($)</option>
+                            <option value="fixed">Fixed Amount (₹)</option>
                         </select>
                     </div>
                     <div class="form-group col">
                         <label>Discount Value</label>
-                        <input type="number" step="0.01" id="coupValue" required placeholder="15" class="form-input">
+                        <input type="number" step="0.01" id="coupValue" required placeholder="500" class="form-input">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col">
-                        <label>Min Purchase ($)</label>
-                        <input type="number" step="0.01" id="coupMin" value="50" class="form-input">
+                        <label>Min Purchase (₹)</label>
+                        <input type="number" step="0.01" id="coupMin" value="1000" class="form-input">
                     </div>
                     <div class="form-group col">
                         <label>Max Uses</label>

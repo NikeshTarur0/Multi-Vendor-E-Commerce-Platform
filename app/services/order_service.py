@@ -87,12 +87,12 @@ class OrderService:
             if vendor:
                 vendor.total_sales += (item_info["price"] * item_info["quantity"])
 
-        # Create Mock Payment Transaction
-        tx_ref = f"TX-{secrets.token_hex(6).upper()}"
+        # Create Razorpay Payment Transaction
+        tx_ref = f"pay_rzp_{secrets.token_hex(8)}"
         payment_tx = PaymentTransaction(
             order_id=order.id,
             transaction_ref=tx_ref,
-            payment_method=req.payment_method,
+            payment_method=req.payment_method or "razorpay_checkout",
             amount=round(final_amount, 2),
             status="COMPLETED"
         )

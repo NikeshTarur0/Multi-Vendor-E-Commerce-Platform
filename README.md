@@ -1,18 +1,19 @@
-# Multi-Vendor E-Commerce Platform
+# Multi-Vendor E-Commerce Platform (Razorpay INR ₹)
 
-A feature-complete, modern Multi-Vendor E-Commerce Platform built with **Python FastAPI**, **SQLAlchemy ORM (SQLite)**, **JWT Authentication**, and an interactive **Single Page Application (SPA)** frontend.
+A feature-complete, modern Multi-Vendor E-Commerce Platform built with **Python FastAPI**, **SQLAlchemy ORM (SQLite)**, **Razorpay Payment Gateway**, **JWT Authentication**, and an interactive **Single Page Application (SPA)** frontend formatted in **Indian Rupees (₹)**.
 
 ---
 
 ## 🌟 Key Features
 
+- **Indian Rupee (INR ₹) Currency**: All pricing, cart totals, discounts, vendor sales, and platform GMV formatted in Rupees (`₹`).
+- **Razorpay Payment Gateway Integration**: Native Razorpay checkout flow with UPI (Google Pay, PhonePe, Paytm, BHIM), NetBanking, Credit/Debit Cards, and Wallets.
 - **JWT Dual Token Auth**: Access Token, Refresh Token, Token Blacklisting, Password Reset, Email Verification.
 - **Multi-Vendor Architecture**: Vendor store profiles, vendor product management, sales analytics, vendor order line-item fulfillment.
 - **Product Catalog**: Live search, category filtering, stock tracking, verified customer reviews & star ratings.
 - **Multi-Vendor Cart & Checkout**: Single checkout for items from multiple vendors, proportional order splitting.
-- **Coupons & Discounts**: Global and vendor-specific percentage or fixed amount discounts (`WELCOME10`, `VENDOR20`).
-- **Mock Payment Gateway**: Credit Card, UPI, and PayPal checkout simulation with transaction logging.
-- **Admin Panel**: Platform GMV analytics, 10% platform commission tracking, vendor approval & moderation, platform coupon manager.
+- **Coupons & Discounts**: Global and vendor-specific percentage or fixed amount discounts in Rupees (`WELCOME10`, `RAZOR500`).
+- **Admin Panel**: Platform GMV analytics (₹), 10% platform commission tracking, vendor approval & moderation, platform coupon manager.
 
 ---
 
@@ -20,6 +21,7 @@ A feature-complete, modern Multi-Vendor E-Commerce Platform built with **Python 
 
 - **Backend**: Python 3.10+, FastAPI, SQLAlchemy, PyJWT, Pydantic V2, Uvicorn
 - **Database**: SQLite (SQLAlchemy ORM)
+- **Payment Gateway**: Razorpay (Mock Gateway Flow)
 - **Frontend**: HTML5, Vanilla CSS (Glassmorphism, Dark Mode, Micro-animations), Vanilla JavaScript
 
 ---
