@@ -837,10 +837,57 @@ button, input, select, textarea {
     animation: slideInRight 0.3s ease;
 }
 
-.toast-success { border-left-color: var(--accent-emerald); }
-.toast-error { border-left-color: var(--accent-rose); }
-
-@keyframes slideInRight {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
+/* Razorpay Payment Tabs & Scannable QR Styles */
+.payment-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
 }
+
+.pay-tab {
+    flex: 1;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.pay-tab.active, .pay-tab:hover {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: var(--accent-emerald);
+    color: #ffffff;
+}
+
+.pay-view {
+    display: none;
+}
+
+.pay-view.active {
+    display: block;
+    animation: fadeIn 0.25s ease;
+}
+
+.qr-container {
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.qr-container:hover {
+    transform: scale(1.03);
+}
+
+.upi-copy-box {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+

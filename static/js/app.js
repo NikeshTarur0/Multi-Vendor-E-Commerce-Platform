@@ -923,6 +923,35 @@ async function handleCreateCouponSubmit(e) {
     }
 }
 
+// Razorpay Payment Modal Tab Switcher & UPI Copy Helper
+function switchPayTab(tab) {
+    document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.pay-view').forEach(v => v.classList.remove('active'));
+
+    if (tab === 'upi') {
+        document.getElementById('tabUPI').classList.add('active');
+        document.getElementById('payViewUPI').classList.add('active');
+        document.getElementById('paymentMethod').value = 'razorpay_upi';
+    } else if (tab === 'card') {
+        document.getElementById('tabCard').classList.add('active');
+        document.getElementById('payViewCard').classList.add('active');
+        document.getElementById('paymentMethod').value = 'razorpay_card';
+    } else if (tab === 'net') {
+        document.getElementById('tabNet').classList.add('active');
+        document.getElementById('payViewNet').classList.add('active');
+        document.getElementById('paymentMethod').value = 'razorpay_netbanking';
+    }
+}
+
+function copyUPIID() {
+    const upiId = document.getElementById('merchantUPIID').innerText;
+    navigator.clipboard.writeText(upiId).then(() => {
+        showToast(`UPI ID '${upiId}' copied to clipboard!`, 'success');
+    }).catch(() => {
+        showToast(`UPI ID: ${upiId}`, 'info');
+    });
+}
+
 // Modal Helpers
 function openModal(id) { document.getElementById(id).classList.add('active'); }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }

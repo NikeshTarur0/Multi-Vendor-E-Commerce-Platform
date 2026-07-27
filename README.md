@@ -1,4 +1,4 @@
-# Multi-Vendor E-Commerce Platform (Razorpay INR ₹)
+# Multi-Vendor E-Commerce Platform (Razorpay INR ₹ with Scannable UPI QR)
 
 A feature-complete, modern Multi-Vendor E-Commerce Platform built with **Python FastAPI**, **SQLAlchemy ORM (SQLite)**, **Razorpay Payment Gateway**, **JWT Authentication**, and an interactive **Single Page Application (SPA)** frontend formatted in **Indian Rupees (₹)**.
 
@@ -6,8 +6,9 @@ A feature-complete, modern Multi-Vendor E-Commerce Platform built with **Python 
 
 ## 🌟 Key Features
 
+- **Scannable Razorpay UPI QR & Merchant UPI ID**: Interactive Razorpay checkout modal displaying a scannable UPI QR Code, official merchant UPI ID (`nexusmarket.merchant@razorpay`) with 1-click copy, and custom VPA input field.
 - **Indian Rupee (INR ₹) Currency**: All pricing, cart totals, discounts, vendor sales, and platform GMV formatted in Rupees (`₹`).
-- **Razorpay Payment Gateway Integration**: Native Razorpay checkout flow with UPI (Google Pay, PhonePe, Paytm, BHIM), NetBanking, Credit/Debit Cards, and Wallets.
+- **Razorpay Payment Gateway Integration**: Razorpay checkout flow with UPI (Google Pay, PhonePe, Paytm, BHIM), NetBanking, Credit/Debit Cards, and Wallets.
 - **JWT Dual Token Auth**: Access Token, Refresh Token, Token Blacklisting, Password Reset, Email Verification.
 - **Multi-Vendor Architecture**: Vendor store profiles, vendor product management, sales analytics, vendor order line-item fulfillment.
 - **Product Catalog**: Live search, category filtering, stock tracking, verified customer reviews & star ratings.
@@ -21,7 +22,7 @@ A feature-complete, modern Multi-Vendor E-Commerce Platform built with **Python 
 
 - **Backend**: Python 3.10+, FastAPI, SQLAlchemy, PyJWT, Pydantic V2, Uvicorn
 - **Database**: SQLite (SQLAlchemy ORM)
-- **Payment Gateway**: Razorpay (Mock Gateway Flow)
+- **Payment Gateway**: Razorpay (Interactive UPI QR & Merchant VPA)
 - **Frontend**: HTML5, Vanilla CSS (Glassmorphism, Dark Mode, Micro-animations), Vanilla JavaScript
 
 ---

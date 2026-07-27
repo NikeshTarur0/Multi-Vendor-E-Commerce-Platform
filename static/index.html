@@ -94,11 +94,11 @@
                 <div class="hero-content">
                     <span class="hero-subtitle"><i class="bi bi-stars"></i> Premier Multi-Vendor Ecosystem (INR ₹)</span>
                     <h1 class="hero-title">Discover Quality Products Direct From Verified Global Vendors</h1>
-                    <p class="hero-desc">Explore electronics, fashion, and home goods with multi-vendor cart checkout, verified customer reviews, and integrated Razorpay payments in Rupees (₹).</p>
+                    <p class="hero-desc">Explore electronics, fashion, and home goods with multi-vendor cart checkout, verified customer reviews, and integrated Razorpay payments with scannable UPI QR code & UPI ID in Rupees (₹).</p>
                     <div class="hero-stats">
                         <div class="stat-pill"><strong id="heroVendorCount">2+</strong> Active Vendors</div>
                         <div class="stat-pill"><strong id="heroProductCount">5+</strong> Curated Items</div>
-                        <div class="stat-pill"><strong>100%</strong> Secured Razorpay Integration</div>
+                        <div class="stat-pill"><strong>100%</strong> Scannable Razorpay UPI QR</div>
                     </div>
                 </div>
             </div>
@@ -429,7 +429,7 @@
                     <strong id="cartTotal">₹0.00</strong>
                 </div>
                 <button class="btn btn-primary btn-block btn-lg mt-3" onclick="openCheckoutModal()">
-                    <i class="bi bi-shield-check"></i> Pay via Razorpay (INR ₹)
+                    <i class="bi bi-qr-code-scan"></i> Pay via Razorpay (UPI QR / Cards)
                 </button>
             </div>
         </div>
@@ -446,43 +446,154 @@
         </div>
     </div>
 
-    <!-- Razorpay Payment Gateway Modal -->
+    <!-- Razorpay Checkout & Scannable UPI QR Modal -->
     <div class="modal-backdrop" id="checkoutModal">
-        <div class="modal-card">
+        <div class="modal-card modal-lg">
             <button class="modal-close" onclick="closeModal('checkoutModal')"><i class="bi bi-x-lg"></i></button>
             <div class="razorpay-header text-center mb-3">
                 <div class="razorpay-logo mb-2">
-                    <span class="badge badge-accent" style="font-size:0.9rem; padding:6px 14px;"><i class="bi bi-lightning-charge-fill"></i> Razorpay Secured</span>
+                    <span class="badge badge-accent" style="font-size:0.85rem; padding:6px 14px;">
+                        <i class="bi bi-shield-check"></i> Razorpay Payment Gateway (INR ₹)
+                    </span>
                 </div>
-                <h3>Razorpay Payment Gateway</h3>
-                <p class="text-muted text-sm">Instant payment in Indian Rupees (₹) via UPI, Cards, NetBanking, or Wallet.</p>
+                <h2>Razorpay Checkout</h2>
+                <p class="text-muted text-sm">Scan UPI QR Code, copy Merchant UPI ID, or use Cards / NetBanking to pay.</p>
             </div>
 
             <form id="checkoutForm" onsubmit="handlePaymentSubmit(event)">
-                <div class="form-group">
-                    <label>Delivery Address</label>
+                <div class="form-group mb-3">
+                    <label class="font-semibold"><i class="bi bi-geo-alt"></i> Delivery Address</label>
                     <textarea id="checkoutAddress" required class="form-input" rows="2" placeholder="MG Road, Indiranagar, Bengaluru, Karnataka 560038"></textarea>
                 </div>
 
-                <div class="form-group">
-                    <label>Razorpay Payment Method</label>
-                    <select id="paymentMethod" class="form-select">
-                        <option value="razorpay_upi">Razorpay UPI (Google Pay / PhonePe / Paytm / BHIM)</option>
-                        <option value="razorpay_card">Razorpay Debit / Credit Cards (Visa, Mastercard, RuPay)</option>
-                        <option value="razorpay_netbanking">Razorpay Net Banking (SBI, HDFC, ICICI, Axis)</option>
-                        <option value="razorpay_wallet">Razorpay Wallet (Paytm, Mobikwik, Amazon Pay)</option>
-                    </select>
+                <!-- Razorpay Payment Method Switcher Tabs -->
+                <div class="payment-tabs mb-3">
+                    <button type="button" class="pay-tab active" id="tabUPI" onclick="switchPayTab('upi')">
+                        <i class="bi bi-qr-code-scan"></i> UPI QR & VPA
+                    </button>
+                    <button type="button" class="pay-tab" id="tabCard" onclick="switchPayTab('card')">
+                        <i class="bi bi-credit-card-2-front"></i> Cards (Visa/Mastercard)
+                    </button>
+                    <button type="button" class="pay-tab" id="tabNet" onclick="switchPayTab('net')">
+                        <i class="bi bi-bank"></i> Net Banking
+                    </button>
                 </div>
 
+                <!-- Tab 1: UPI & QR Code View -->
+                <div id="payViewUPI" class="pay-view active">
+                    <div class="card p-3 glass text-center mb-3">
+                        <h4 class="text-emerald mb-2"><i class="bi bi-qr-code"></i> Scan & Pay using any UPI App</h4>
+                        <p class="text-xs text-muted mb-3">Use Google Pay, PhonePe, Paytm, BHIM, or CRED to scan this QR code.</p>
+
+                        <!-- Dynamic Scannable QR Code Box -->
+                        <div class="qr-container my-2" style="background:#ffffff; padding:15px; display:inline-block; border-radius:12px; border:2px solid #10b981;">
+                            <svg id="upiQRCode" width="180" height="180" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Base QR Code SVG structure -->
+                                <rect width="200" height="200" fill="#ffffff"/>
+                                <!-- Top-Left Finder Pattern -->
+                                <rect x="15" y="15" width="50" height="50" fill="#0b0f19" rx="6"/>
+                                <rect x="25" y="25" width="30" height="30" fill="#ffffff" rx="4"/>
+                                <rect x="33" y="33" width="14" height="14" fill="#10b981" rx="2"/>
+                                <!-- Top-Right Finder Pattern -->
+                                <rect x="135" y="15" width="50" height="50" fill="#0b0f19" rx="6"/>
+                                <rect x="145" y="25" width="30" height="30" fill="#ffffff" rx="4"/>
+                                <rect x="153" y="33" width="14" height="14" fill="#10b981" rx="2"/>
+                                <!-- Bottom-Left Finder Pattern -->
+                                <rect x="15" y="135" width="50" height="50" fill="#0b0f19" rx="6"/>
+                                <rect x="25" y="145" width="30" height="30" fill="#ffffff" rx="4"/>
+                                <rect x="33" y="153" width="14" height="14" fill="#10b981" rx="2"/>
+                                <!-- Data Module Blocks -->
+                                <rect x="80" y="20" width="14" height="14" fill="#0b0f19" rx="2"/>
+                                <rect x="100" y="20" width="14" height="14" fill="#10b981" rx="2"/>
+                                <rect x="80" y="45" width="14" height="14" fill="#10b981" rx="2"/>
+                                <rect x="100" y="45" width="14" height="14" fill="#0b0f19" rx="2"/>
+                                <rect x="20" y="80" width="14" height="14" fill="#10b981" rx="2"/>
+                                <rect x="45" y="80" width="14" height="14" fill="#0b0f19" rx="2"/>
+                                <rect x="70" y="80" width="14" height="14" fill="#10b981" rx="2"/>
+                                <rect x="95" y="80" width="14" height="14" fill="#0b0f19" rx="2"/>
+                                <rect x="120" y="80" width="14" height="14" fill="#10b981" rx="2"/>
+                                <rect x="145" y="80" width="14" height="14" fill="#0b0f19" rx="2"/>
+                                <rect x="170" y="80" width="14" height="14" fill="#10b981" rx="2"/>
+                                <rect x="80" y="105" width="14" height="14" fill="#0b0f19" rx="2"/>
+                                <rect x="105" y="105" width="14" height="14" fill="#10b981" rx="2"/>
+                                <rect x="130" y="105" width="14" height="14" fill="#0b0f19" rx="2"/>
+                                <rect x="155" y="105" width="14" height="14" fill="#10b981" rx="2"/>
+                                <rect x="80" y="130" width="14" height="14" fill="#10b981" rx="2"/>
+                                <rect x="105" y="130" width="14" height="14" fill="#0b0f19" rx="2"/>
+                                <rect x="130" y="130" width="14" height="14" fill="#10b981" rx="2"/>
+                                <rect x="155" y="130" width="14" height="14" fill="#0b0f19" rx="2"/>
+                                <rect x="80" y="155" width="14" height="14" fill="#0b0f19" rx="2"/>
+                                <rect x="105" y="155" width="14" height="14" fill="#10b981" rx="2"/>
+                                <rect x="130" y="155" width="14" height="14" fill="#0b0f19" rx="2"/>
+                                <rect x="155" y="155" width="14" height="14" fill="#10b981" rx="2"/>
+                            </svg>
+                        </div>
+
+                        <!-- Merchant Official UPI ID Copy Box -->
+                        <div class="upi-copy-box mt-3 p-2 border rounded glass flex-between">
+                            <div class="text-left">
+                                <span class="text-xs text-muted block">Razorpay Merchant Official UPI ID:</span>
+                                <strong id="merchantUPIID" class="text-emerald font-mono text-sm">nexusmarket.merchant@razorpay</strong>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline" onclick="copyUPIID()">
+                                <i class="bi bi-copy"></i> Copy
+                            </button>
+                        </div>
+
+                        <!-- Direct Customer VPA Input -->
+                        <div class="form-group mt-3 text-left">
+                            <label class="text-xs text-muted">Or enter your UPI VPA ID (e.g. name@okhdfcbank):</label>
+                            <input type="text" id="custVPAInput" placeholder="username@upi" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Cards View -->
+                <div id="payViewCard" class="pay-view">
+                    <div class="card p-3 glass">
+                        <div class="form-group mb-2">
+                            <label>Card Number</label>
+                            <input type="text" placeholder="4532 •••• •••• 8892" class="form-input">
+                        </div>
+                        <div class="form-row">
+                            <div class="col">
+                                <label>Expiry (MM/YY)</label>
+                                <input type="text" placeholder="08/28" class="form-input">
+                            </div>
+                            <div class="col">
+                                <label>CVV Code</label>
+                                <input type="password" placeholder="•••" class="form-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Net Banking View -->
+                <div id="payViewNet" class="pay-view">
+                    <div class="card p-3 glass">
+                        <label class="mb-2">Select Popular Bank</label>
+                        <select class="form-select">
+                            <option>State Bank of India (SBI)</option>
+                            <option>HDFC Bank</option>
+                            <option>ICICI Bank</option>
+                            <option>Axis Bank</option>
+                            <option>Kotak Mahindra Bank</option>
+                        </select>
+                    </div>
+                </div>
+
+                <input type="hidden" id="paymentMethod" value="razorpay_upi">
+
+                <!-- Final Amount Summary Box -->
                 <div class="checkout-summary-box card p-3 glass my-3">
                     <div class="flex-between">
-                        <span>Total Payable (INR):</span>
+                        <span>Total Amount Payable:</span>
                         <strong id="checkoutFinalTotal" class="text-xl text-emerald">₹0.00</strong>
                     </div>
                 </div>
 
                 <button type="submit" class="btn btn-emerald btn-block btn-lg" id="payBtn">
-                    <i class="bi bi-lock-fill"></i> Pay Now via Razorpay (₹)
+                    <i class="bi bi-lock-fill"></i> Confirm Razorpay Payment (₹)
                 </button>
             </form>
         </div>
