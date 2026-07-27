@@ -5,6 +5,8 @@ from app.schemas.user import UserOut, UserUpdate
 from app.dependencies.auth import get_current_user
 from app.models.user import User
 
+from app.core.security import hash_password
+
 router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.get("/profile", response_model=UserOut)
@@ -20,6 +22,15 @@ def update_profile(req: UserUpdate, current_user: User = Depends(get_current_use
         if existing:
             raise HTTPException(status_code=400, detail="Email already taken")
         current_user.email = req.email
+    if req.phone is not None:
+        current_user.phone = req.phone
+    if req.address is not None:
+        current_user.address = req.address
+    if req.upi_vpa is not None:
+        current_user.upi_vpa = req.upi_vpa
+    if req.new_password:
+        current_user.hashed_password = hash_password(req.new_password)
+        
     db.commit()
     db.refresh(current_user)
     return current_user

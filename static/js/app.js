@@ -97,6 +97,34 @@ async function fetchUserProfile() {
     }
 }
 
+let selectedPortalRole = 'customer';
+
+function selectLoginPortal(role) {
+    selectedPortalRole = role;
+    document.querySelectorAll('.role-portal-btn').forEach(btn => btn.classList.remove('active'));
+
+    const emailInput = document.getElementById('loginEmail');
+    const emailLabel = document.getElementById('loginEmailLabel');
+    const submitBtn = document.getElementById('loginSubmitBtn');
+
+    if (role === 'customer') {
+        document.getElementById('portalCustomerBtn').classList.add('active');
+        if (emailLabel) emailLabel.innerText = 'Email Address (Customer Portal)';
+        if (submitBtn) submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Log In to Customer Portal';
+        if (emailInput && (!emailInput.value || emailInput.value.includes('@'))) emailInput.value = 'customer@gmail.com';
+    } else if (role === 'vendor') {
+        document.getElementById('portalVendorBtn').classList.add('active');
+        if (emailLabel) emailLabel.innerText = 'Email Address (Seller Hub)';
+        if (submitBtn) submitBtn.innerHTML = '<i class="bi bi-shop"></i> Log In to Seller Hub';
+        if (emailInput && (!emailInput.value || emailInput.value.includes('@'))) emailInput.value = 'vendor1@technexus.com';
+    } else if (role === 'admin') {
+        document.getElementById('portalAdminBtn').classList.add('active');
+        if (emailLabel) emailLabel.innerText = 'Email Address (Admin Portal)';
+        if (submitBtn) submitBtn.innerHTML = '<i class="bi bi-shield-check"></i> Log In to Admin Portal';
+        if (emailInput && (!emailInput.value || emailInput.value.includes('@'))) emailInput.value = 'admin@ecommerce.com';
+    }
+}
+
 function renderUserMenu() {
     const userMenu = document.getElementById('userMenu');
     const vendorNavBtn = document.getElementById('vendorNavBtn');
@@ -116,15 +144,48 @@ function renderUserMenu() {
     vendorNavBtn.style.display = currentUser.role === 'vendor' ? 'flex' : 'none';
     adminNavBtn.style.display = currentUser.role === 'admin' ? 'flex' : 'none';
 
-    userMenu.innerHTML = `
-        <div class="flex-between gap-2">
-            <span class="text-sm font-semibold text-primary"><i class="bi bi-person-circle"></i> ${currentUser.full_name} (${currentUser.role})</span>
-            <button class="btn btn-sm btn-outline" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
-        </div>
-    `;
+    if (currentUser.role === 'vendor') {
+        userMenu.innerHTML = `
+            <div class="flex-between gap-2">
+                <button class="btn btn-sm btn-outline" onclick="switchView('vendor-profile')">
+                    <i class="bi bi-shop"></i> Seller Profile
+                </button>
+                <button class="btn btn-sm btn-outline" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+            </div>
+        `;
+    } else if (currentUser.role === 'admin') {
+        userMenu.innerHTML = `
+            <div class="flex-between gap-2">
+                <button class="btn btn-sm btn-outline" onclick="switchView('admin-profile')">
+                    <i class="bi bi-shield-check"></i> Admin Profile
+                </button>
+                <button class="btn btn-sm btn-outline" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+            </div>
+        `;
+    } else {
+        userMenu.innerHTML = `
+            <div class="flex-between gap-2">
+                <button class="btn btn-sm btn-outline" onclick="switchView('customer-profile')">
+                    <i class="bi bi-person-circle"></i> My Profile
+                </button>
+                <button class="btn btn-sm btn-outline" onclick="switchView('orders')">
+                    <i class="bi bi-receipt"></i> Orders
+                </button>
+                <button class="btn btn-sm btn-outline" onclick="logout()"><i class="bi bi-box-arrow-right"></i></button>
+            </div>
+        `;
+    }
 }
 
-async function quickLogin(email, password) {
+async function quickLogin(email, password, portalRole) {
+    if (portalRole) {
+        selectLoginPortal(portalRole);
+    }
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    if (loginEmail) loginEmail.value = email;
+    if (loginPassword) loginPassword.value = password;
+
     try {
         const res = await fetch('/api/auth/login', {
             method: 'POST',
@@ -138,11 +199,11 @@ async function quickLogin(email, password) {
             localStorage.setItem('access_token', accessToken);
             localStorage.setItem('refresh_token', refreshToken);
             await fetchUserProfile();
-            showToast(`Logged in as ${currentUser.full_name}`, 'success');
+            showToast(`Logged in as ${currentUser.full_name} (${currentUser.role.toUpperCase()})`, 'success');
 
-            if (currentUser.role === 'vendor') switchView('vendor-dashboard');
-            else if (currentUser.role === 'admin') switchView('admin-dashboard');
-            else switchView('shop');
+            if (currentUser.role === 'vendor') switchView('vendor-profile');
+            else if (currentUser.role === 'admin') switchView('admin-profile');
+            else switchView('customer-profile');
         } else {
             showToast(data.detail || 'Login failed', 'error');
         }
@@ -175,6 +236,28 @@ function switchView(viewName) {
     } else if (viewName === 'orders') {
         document.getElementById('ordersView').classList.add('active');
         loadCustomerOrders();
+    } else if (viewName === 'customer-profile') {
+        if (!currentUser) {
+            openAuthModal('login');
+            showToast('Please log in to view profile', 'info');
+            return;
+        }
+        document.getElementById('customerProfileView').classList.add('active');
+        populateCustomerProfile();
+    } else if (viewName === 'vendor-profile') {
+        if (!currentUser || currentUser.role !== 'vendor') {
+            showToast('Vendor access required', 'error');
+            return;
+        }
+        document.getElementById('vendorProfileView').classList.add('active');
+        populateVendorProfile();
+    } else if (viewName === 'admin-profile') {
+        if (!currentUser || currentUser.role !== 'admin') {
+            showToast('Admin access required', 'error');
+            return;
+        }
+        document.getElementById('adminProfileView').classList.add('active');
+        populateAdminProfile();
     } else if (viewName === 'vendor-dashboard') {
         if (!currentUser || currentUser.role !== 'vendor') {
             showToast('Vendor access required', 'error');
@@ -189,6 +272,167 @@ function switchView(viewName) {
         }
         document.getElementById('adminView').classList.add('active');
         loadAdminDashboard();
+    }
+}
+
+// Profile Population & Update Handlers
+async function populateCustomerProfile() {
+    if (!currentUser) return;
+    document.getElementById('custProfileTitle').innerText = `${currentUser.full_name}'s Account Profile`;
+    document.getElementById('custFullNameInput').value = currentUser.full_name || '';
+    document.getElementById('custEmailInput').value = currentUser.email || '';
+    document.getElementById('custPhoneInput').value = currentUser.phone || '';
+    document.getElementById('custAddressInput').value = currentUser.address || '';
+    document.getElementById('custUpiInput').value = currentUser.upi_vpa || '';
+    if (currentUser.created_at) {
+        const d = new Date(currentUser.created_at);
+        document.getElementById('custMemberSince').innerText = `Member since ${d.toLocaleDateString()}`;
+    }
+}
+
+async function handleCustomerProfileSave(e) {
+    e.preventDefault();
+    const full_name = document.getElementById('custFullNameInput').value;
+    const email = document.getElementById('custEmailInput').value;
+    const phone = document.getElementById('custPhoneInput').value;
+
+    try {
+        const res = await apiFetch('/api/users/profile', {
+            method: 'PUT',
+            body: { full_name, email, phone }
+        });
+        if (res.ok) {
+            currentUser = await res.json();
+            renderUserMenu();
+            showToast('Personal details updated successfully!', 'success');
+        } else {
+            const err = await res.json();
+            showToast(err.detail || 'Update failed', 'error');
+        }
+    } catch (e) {
+        showToast('Error saving profile', 'error');
+    }
+}
+
+async function handleCustomerAddressSave(e) {
+    e.preventDefault();
+    const address = document.getElementById('custAddressInput').value;
+    const upi_vpa = document.getElementById('custUpiInput').value;
+
+    try {
+        const res = await apiFetch('/api/users/profile', {
+            method: 'PUT',
+            body: { address, upi_vpa }
+        });
+        if (res.ok) {
+            currentUser = await res.json();
+            showToast('Shipping address and Razorpay UPI VPA saved!', 'success');
+        } else {
+            const err = await res.json();
+            showToast(err.detail || 'Update failed', 'error');
+        }
+    } catch (e) {
+        showToast('Error saving address/UPI', 'error');
+    }
+}
+
+async function handleCustomerPasswordSave(e) {
+    e.preventDefault();
+    const new_password = document.getElementById('custNewPasswordInput').value;
+
+    try {
+        const res = await apiFetch('/api/users/profile', {
+            method: 'PUT',
+            body: { new_password }
+        });
+        if (res.ok) {
+            document.getElementById('custNewPasswordInput').value = '';
+            showToast('Password updated successfully!', 'success');
+        } else {
+            const err = await res.json();
+            showToast(err.detail || 'Password update failed', 'error');
+        }
+    } catch (e) {
+        showToast('Error updating password', 'error');
+    }
+}
+
+async function populateVendorProfile() {
+    if (!currentUser || currentUser.role !== 'vendor') return;
+    try {
+        const res = await apiFetch('/api/vendors/me');
+        if (res.ok) {
+            const vendor = await res.json();
+            document.getElementById('vendorProfileStoreTitle').innerText = vendor.store_name;
+            document.getElementById('vendorStoreNameInput').value = vendor.store_name;
+            document.getElementById('vendorLogoUrlInput').value = vendor.logo_url || '';
+            document.getElementById('vendorDescriptionInput').value = vendor.description || '';
+            document.getElementById('vendorProfileRating').innerText = `${vendor.rating} / 5.0`;
+            document.getElementById('vendorProfileSales').innerText = formatRupees(vendor.total_sales);
+            if (vendor.logo_url) {
+                document.getElementById('vendorProfileLogoPreview').src = vendor.logo_url;
+            }
+            const savedVpa = localStorage.getItem(`vendor_vpa_${vendor.id}`) || 'sellerstore@okicici';
+            document.getElementById('vendorPayoutVpaInput').value = savedVpa;
+            const savedGstin = localStorage.getItem(`vendor_gstin_${vendor.id}`) || '29ABCDE1234F1Z5';
+            document.getElementById('vendorGstinInput').value = savedGstin;
+        }
+    } catch (e) {
+        console.error('Failed to load vendor profile:', e);
+    }
+}
+
+async function handleVendorProfileSave(e) {
+    e.preventDefault();
+    const store_name = document.getElementById('vendorStoreNameInput').value;
+    const logo_url = document.getElementById('vendorLogoUrlInput').value;
+    const description = document.getElementById('vendorDescriptionInput').value;
+
+    try {
+        const res = await apiFetch('/api/vendors/me', {
+            method: 'PUT',
+            body: { store_name, logo_url, description }
+        });
+        if (res.ok) {
+            const vendor = await res.json();
+            document.getElementById('vendorProfileStoreTitle').innerText = vendor.store_name;
+            if (vendor.logo_url) {
+                document.getElementById('vendorProfileLogoPreview').src = vendor.logo_url;
+            }
+            showToast('Vendor store profile updated successfully!', 'success');
+        } else {
+            const err = await res.json();
+            showToast(err.detail || 'Store profile update failed', 'error');
+        }
+    } catch (e) {
+        showToast('Error updating store profile', 'error');
+    }
+}
+
+function handleVendorFinancialSave(e) {
+    e.preventDefault();
+    const vpa = document.getElementById('vendorPayoutVpaInput').value;
+    const gstin = document.getElementById('vendorGstinInput').value;
+    if (currentUser) {
+        localStorage.setItem(`vendor_vpa_${currentUser.id}`, vpa);
+        localStorage.setItem(`vendor_gstin_${currentUser.id}`, gstin);
+    }
+    showToast('Seller payout VPA and GSTIN details saved!', 'success');
+}
+
+async function populateAdminProfile() {
+    if (!currentUser || currentUser.role !== 'admin') return;
+    document.getElementById('adminProfileName').innerText = currentUser.full_name;
+    document.getElementById('adminProfileEmail').innerText = currentUser.email;
+    try {
+        const res = await apiFetch('/api/admin/stats');
+        if (res.ok) {
+            const stats = await res.json();
+            document.getElementById('adminProfileGMV').innerText = formatRupees(stats.total_gmv);
+            document.getElementById('adminProfileCommission').innerText = formatRupees(stats.platform_commission);
+        }
+    } catch (e) {
+        console.error('Failed to fetch admin stats for profile:', e);
     }
 }
 
@@ -606,6 +850,14 @@ function openCheckoutModal() {
     const finalTotal = Math.max(0, subtotal - discount);
 
     document.getElementById('checkoutFinalTotal').innerText = formatRupees(finalTotal);
+
+    if (currentUser.address && document.getElementById('checkoutAddress')) {
+        document.getElementById('checkoutAddress').value = currentUser.address;
+    }
+    if (currentUser.upi_vpa && document.getElementById('custVPAInput')) {
+        document.getElementById('custVPAInput').value = currentUser.upi_vpa;
+    }
+
     closeCartDrawer();
     openModal('checkoutModal');
 }

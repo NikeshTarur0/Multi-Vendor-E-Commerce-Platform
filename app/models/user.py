@@ -15,6 +15,9 @@ class User(Base):
     verification_code = Column(String(64), nullable=True)
     reset_token = Column(String(64), nullable=True)
     status = Column(String(20), default="active") # 'active', 'suspended'
+    phone = Column(String(20), nullable=True)
+    address = Column(String(500), nullable=True)
+    upi_vpa = Column(String(100), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # Relationships

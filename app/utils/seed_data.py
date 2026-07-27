@@ -3,9 +3,30 @@ from app.database.session import SessionLocal, engine, Base
 from app.models import User, Vendor, Category, Product, Coupon, Review
 from app.core.security import hash_password
 
+from sqlalchemy import text
+
+def check_and_migrate_db(db: Session):
+    try:
+        result = db.execute(text("PRAGMA table_info(users)"))
+        columns = [row[1] for row in result.fetchall()]
+        if columns:
+            if "phone" not in columns:
+                db.execute(text("ALTER TABLE users ADD COLUMN phone VARCHAR(20)"))
+            if "address" not in columns:
+                db.execute(text("ALTER TABLE users ADD COLUMN address VARCHAR(500)"))
+            if "upi_vpa" not in columns:
+                db.execute(text("ALTER TABLE users ADD COLUMN upi_vpa VARCHAR(100)"))
+            db.commit()
+    except Exception as e:
+        print("[MIGRATION LOG]", e)
+        db.rollback()
+
 def seed_database(db: Session):
     # Create tables if not exist
     Base.metadata.create_all(bind=engine)
+    
+    # Auto-migrate missing columns for existing SQLite database
+    check_and_migrate_db(db)
 
     # 1. Update product prices to Rupees if already seeded
     p1 = db.query(Product).filter(Product.id == 1).first()
