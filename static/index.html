@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusMarket - Multi-Vendor E-Commerce Platform</title>
+    <meta name="description" content="Next-generation multi-vendor e-commerce platform powered by Python FastAPI, JWT Auth, and modern frontend architecture.">
+    <!-- Google Fonts & Bootstrap Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <!-- Top Demo Navigation Bar -->
+    <div class="demo-banner">
+        <div class="container demo-banner-content">
+            <span class="demo-badge"><i class="bi bi-lightning-charge-fill"></i> Interactive Demo Mode</span>
+            <span class="demo-label">Quick Role Login:</span>
+            <div class="demo-buttons">
+                <button class="btn btn-sm btn-outline" onclick="quickLogin('customer@gmail.com', 'customer123')">
+                    <i class="bi bi-person"></i> Customer
+                </button>
+                <button class="btn btn-sm btn-outline" onclick="quickLogin('vendor1@technexus.com', 'vendor123')">
+                    <i class="bi bi-shop"></i> Vendor (TechNexus)
+                </button>
+                <button class="btn btn-sm btn-outline" onclick="quickLogin('admin@ecommerce.com', 'admin123')">
+                    <i class="bi bi-shield-check"></i> Admin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Header -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="#" class="brand-logo" onclick="switchView('shop')">
+                <div class="logo-icon"><i class="bi bi-cart4"></i></div>
+                <div class="logo-text">Nexus<span>Market</span></div>
+            </a>
+
+            <!-- Search Bar -->
+            <div class="search-box">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search products, vendors, categories..." onkeyup="handleSearch(event)">
+                <button class="search-btn" onclick="triggerSearch()"><i class="bi bi-arrow-right"></i></button>
+            </div>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <button class="nav-link-btn" onclick="switchView('shop')">
+                    <i class="bi bi-grid-fill"></i> <span>Catalog</span>
+                </button>
+
+                <button class="nav-link-btn" onclick="openWishlistModal()">
+                    <i class="bi bi-heart"></i>
+                    <span>Wishlist</span>
+                    <span class="badge" id="wishlistBadge">0</span>
+                </button>
+
+                <button class="nav-link-btn" onclick="openCartDrawer()">
+                    <i class="bi bi-bag"></i>
+                    <span>Cart</span>
+                    <span class="badge badge-accent" id="cartBadge">0</span>
+                </button>
+
+                <!-- Role Specific Views -->
+                <button class="nav-link-btn vendor-btn" id="vendorNavBtn" onclick="switchView('vendor-dashboard')" style="display: none;">
+                    <i class="bi bi-speedometer2"></i> <span>Vendor Portal</span>
+                </button>
+
+                <button class="nav-link-btn admin-btn" id="adminNavBtn" onclick="switchView('admin-dashboard')" style="display: none;">
+                    <i class="bi bi-kanban"></i> <span>Admin Panel</span>
+                </button>
+
+                <!-- Auth Menu -->
+                <div class="user-menu" id="userMenu">
+                    <button class="btn btn-primary btn-sm" onclick="openAuthModal('login')">
+                        <i class="bi bi-box-arrow-in-right"></i> Login / Register
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="main-content container">
+
+        <!-- SHOP VIEW -->
+        <section id="shopView" class="view-section active">
+            <!-- Hero Banner -->
+            <div class="hero-card">
+                <div class="hero-content">
+                    <span class="hero-subtitle"><i class="bi bi-stars"></i> Premier Multi-Vendor Ecosystem</span>
+                    <h1 class="hero-title">Discover Quality Products Direct From Verified Global Vendors</h1>
+                    <p class="hero-desc">Explore electronics, fashion, and home goods with multi-vendor cart checkout, verified customer reviews, and instant order tracking.</p>
+                    <div class="hero-stats">
+                        <div class="stat-pill"><strong id="heroVendorCount">2+</strong> Active Vendors</div>
+                        <div class="stat-pill"><strong id="heroProductCount">5+</strong> Curated Items</div>
+                        <div class="stat-pill"><strong>100%</strong> Secured Mock Payments</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Filter Bar -->
+            <div class="category-section">
+                <div class="section-header">
+                    <h2><i class="bi bi-tags"></i> Shop by Category</h2>
+                </div>
+                <div class="category-pills" id="categoryPills">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Product Catalog Grid -->
+            <div class="catalog-section">
+                <div class="section-header flex-between">
+                    <div>
+                        <h2><i class="bi bi-grid-3x3-gap"></i> Product Catalog</h2>
+                        <p class="section-sub text-muted" id="catalogResultCount">Showing all active items</p>
+                    </div>
+                    <div class="filter-controls">
+                        <select id="priceFilter" onchange="filterProducts()" class="form-select">
+                            <option value="">All Price Ranges</option>
+                            <option value="0-100">Under $100</option>
+                            <option value="100-200">$100 - $200</option>
+                            <option value="200-500">$200+</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="products-grid" id="productsGrid">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- CUSTOMER ORDERS VIEW -->
+        <section id="ordersView" class="view-section">
+            <div class="section-header">
+                <h2><i class="bi bi-receipt"></i> My Order History</h2>
+                <p class="text-muted">Track your recent orders, line item statuses, and payment details.</p>
+            </div>
+            <div id="ordersList" class="orders-container">
+                <!-- Loaded dynamically -->
+            </div>
+        </section>
+
+        <!-- VENDOR DASHBOARD VIEW -->
+        <section id="vendorView" class="view-section">
+            <div class="dashboard-header flex-between">
+                <div>
+                    <h2><i class="bi bi-shop"></i> Vendor Storefront Dashboard</h2>
+                    <p class="text-muted" id="vendorStoreName">Manage store inventory, view sales earnings, and fulfill order line items.</p>
+                </div>
+                <button class="btn btn-primary" onclick="openAddProductModal()">
+                    <i class="bi bi-plus-lg"></i> Add New Product
+                </button>
+            </div>
+
+            <!-- Vendor Metrics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card glass">
+                    <div class="stat-icon icon-emerald"><i class="bi bi-currency-dollar"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Store Sales</span>
+                        <h3 id="vendorTotalSales">$0.00</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card glass">
+                    <div class="stat-icon icon-indigo"><i class="bi bi-box-seam"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Active Products</span>
+                        <h3 id="vendorProductCount">0</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card glass">
+                    <div class="stat-icon icon-violet"><i class="bi bi-star-fill"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Store Rating</span>
+                        <h3 id="vendorRating">5.0 / 5.0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vendor Products Table -->
+            <div class="card glass shadow-sm mb-4">
+                <div class="card-header">
+                    <h3><i class="bi bi-box"></i> Inventory & Products</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" id="vendorProductsTable">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Rating</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- Loaded dynamically --></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Vendor Orders Table -->
+            <div class="card glass shadow-sm">
+                <div class="card-header">
+                    <h3><i class="bi bi-truck"></i> Vendor Line Item Fulfillment</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" id="vendorOrdersTable">
+                        <thead>
+                            <tr>
+                                <th>Item ID</th>
+                                <th>Order #</th>
+                                <th>Product</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                                <th>Fulfillment Address</th>
+                                <th>Status</th>
+                                <th>Update Status</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- Loaded dynamically --></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADMIN DASHBOARD VIEW -->
+        <section id="adminView" class="view-section">
+            <div class="dashboard-header">
+                <h2><i class="bi bi-shield-lock-fill"></i> Platform Executive Admin Panel</h2>
+                <p class="text-muted">Global analytics, vendor approval workflow, platform commission, and coupon management.</p>
+            </div>
+
+            <!-- Admin Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card glass">
+                    <div class="stat-icon icon-emerald"><i class="bi bi-graph-up-arrow"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Platform Gross Volume (GMV)</span>
+                        <h3 id="adminGMV">$0.00</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card glass">
+                    <div class="stat-icon icon-violet"><i class="bi bi-pie-chart-fill"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Platform Commission (10%)</span>
+                        <h3 id="adminCommission">$0.00</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card glass">
+                    <div class="stat-icon icon-indigo"><i class="bi bi-people-fill"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Active Vendors</span>
+                        <h3 id="adminVendorCount">0</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card glass">
+                    <div class="stat-icon icon-amber"><i class="bi bi-bag-check-fill"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-label">Total Platform Orders</span>
+                        <h3 id="adminOrderCount">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Vendors Management -->
+            <div class="card glass shadow-sm mb-4">
+                <div class="card-header flex-between">
+                    <h3><i class="bi bi-shop-window"></i> Vendor Verification & Moderation</h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" id="adminVendorsTable">
+                        <thead>
+                            <tr>
+                                <th>Vendor ID</th>
+                                <th>Store Name</th>
+                                <th>Owner Email</th>
+                                <th>Products</th>
+                                <th>Total Sales</th>
+                                <th>Status</th>
+                                <th>Moderate Action</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- Loaded dynamically --></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Admin Global Coupons -->
+            <div class="card glass shadow-sm">
+                <div class="card-header flex-between">
+                    <h3><i class="bi bi-ticket-perforated"></i> Platform Coupon Codes</h3>
+                    <button class="btn btn-sm btn-outline" onclick="openCreateCouponModal()">
+                        <i class="bi bi-plus-lg"></i> Create Coupon
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table" id="adminCouponsTable">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Type</th>
+                                <th>Discount</th>
+                                <th>Min Purchase</th>
+                                <th>Uses</th>
+                                <th>Target</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody><!-- Loaded dynamically --></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL OVERLAYS -->
+
+    <!-- Auth Modal (Login / Register / Forgot Password) -->
+    <div class="modal-backdrop" id="authModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('authModal')"><i class="bi bi-x-lg"></i></button>
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Login</button>
+                <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Register</button>
+                <button class="auth-tab" id="tabForgot" onclick="switchAuthTab('forgot')">Reset Pwd</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active" onsubmit="handleLoginSubmit(event)">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" required placeholder="name@example.com" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" class="form-input">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-box-arrow-in-right"></i> Log In</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="auth-form" onsubmit="handleRegisterSubmit(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" required placeholder="John Doe" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" required placeholder="john@example.com" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" required placeholder="••••••••" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Account Role</label>
+                    <select id="regRole" class="form-select" onchange="toggleStoreNameInput()">
+                        <option value="customer">Customer (Shop & Buy)</option>
+                        <option value="vendor">Vendor (Sell Products)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="storeNameGroup" style="display: none;">
+                    <label>Vendor Store Name</label>
+                    <input type="text" id="regStoreName" placeholder="My Awesome Store" class="form-input">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-person-plus"></i> Create Account</button>
+            </form>
+
+            <!-- Forgot Password Form -->
+            <form id="forgotForm" class="auth-form" onsubmit="handleForgotSubmit(event)">
+                <p class="text-sm text-muted mb-3">Enter your registered email address to generate a password reset authorization code.</p>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="forgotEmail" required placeholder="name@example.com" class="form-input">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-key"></i> Request Reset Code</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Detail & Review Modal -->
+    <div class="modal-backdrop" id="productModal">
+        <div class="modal-card modal-lg">
+            <button class="modal-close" onclick="closeModal('productModal')"><i class="bi bi-x-lg"></i></button>
+            <div class="product-detail-grid" id="productDetailContent">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Drawer -->
+    <div class="drawer-backdrop" id="cartDrawer">
+        <div class="drawer-panel">
+            <div class="drawer-header flex-between">
+                <h3><i class="bi bi-bag"></i> Shopping Cart</h3>
+                <button class="btn-icon" onclick="closeCartDrawer()"><i class="bi bi-x-lg"></i></button>
+            </div>
+            <div class="drawer-body" id="cartBody">
+                <!-- Loaded dynamically -->
+            </div>
+            <div class="drawer-footer">
+                <div class="coupon-box mb-3">
+                    <input type="text" id="couponCodeInput" placeholder="Promo code (e.g. WELCOME10)" class="form-input form-input-sm">
+                    <button class="btn btn-sm btn-outline" onclick="applyCoupon()"><i class="bi bi-check2"></i> Apply</button>
+                </div>
+                <div id="couponAppliedMsg" class="coupon-msg"></div>
+
+                <div class="cart-summary-line">
+                    <span>Subtotal:</span>
+                    <strong id="cartSubtotal">$0.00</strong>
+                </div>
+                <div class="cart-summary-line text-emerald" id="discountLine" style="display: none;">
+                    <span>Discount:</span>
+                    <strong id="cartDiscount">-$0.00</strong>
+                </div>
+                <div class="cart-summary-line total-line">
+                    <span>Total Amount:</span>
+                    <strong id="cartTotal">$0.00</strong>
+                </div>
+                <button class="btn btn-primary btn-block btn-lg mt-3" onclick="openCheckoutModal()">
+                    <i class="bi bi-shield-check"></i> Proceed to Mock Checkout
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wishlist Modal -->
+    <div class="modal-backdrop" id="wishlistModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('wishlistModal')"><i class="bi bi-x-lg"></i></button>
+            <h3><i class="bi bi-heart-fill text-rose"></i> My Saved Wishlist</h3>
+            <div id="wishlistItemsList" class="wishlist-container mt-3">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout & Mock Payment Gateway Modal -->
+    <div class="modal-backdrop" id="checkoutModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('checkoutModal')"><i class="bi bi-x-lg"></i></button>
+            <h3><i class="bi bi-credit-card"></i> Mock Payment Gateway</h3>
+            <p class="text-muted text-sm">Simulate end-to-end multi-vendor order payment processing.</p>
+
+            <form id="checkoutForm" onsubmit="handlePaymentSubmit(event)" class="mt-3">
+                <div class="form-group">
+                    <label>Shipping Address</label>
+                    <textarea id="checkoutAddress" required class="form-input" rows="2" placeholder="123 Innovation Way, Suite 400, NY 10001"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select id="paymentMethod" class="form-select">
+                        <option value="mock_card">Credit / Debit Card (Mock)</option>
+                        <option value="mock_upi">Instant UPI Transfer (Mock)</option>
+                        <option value="mock_paypal">PayPal Direct (Mock)</option>
+                    </select>
+                </div>
+
+                <div class="checkout-summary-box">
+                    <div class="flex-between">
+                        <span>Final Order Total:</span>
+                        <strong id="checkoutFinalTotal" class="text-lg text-indigo">$0.00</strong>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-emerald btn-block btn-lg mt-3" id="payBtn">
+                    <i class="bi bi-lock-fill"></i> Pay Now & Place Order
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Product Modal (Vendor) -->
+    <div class="modal-backdrop" id="addProductModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('addProductModal')"><i class="bi bi-x-lg"></i></button>
+            <h3><i class="bi bi-box-seam"></i> Add Product to Inventory</h3>
+            <form id="addProductForm" onsubmit="handleAddProductSubmit(event)" class="mt-3">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="prodName" required placeholder="e.g. Wireless Smart Speaker" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="prodCategory" required class="form-select"></select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label>Price ($)</label>
+                        <input type="number" step="0.01" id="prodPrice" required placeholder="99.99" class="form-input">
+                    </div>
+                    <div class="form-group col">
+                        <label>Stock Qty</label>
+                        <input type="number" id="prodStock" required value="20" class="form-input">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="prodImage" placeholder="https://images.unsplash.com/..." class="form-input">
+                </div>
+                <div class="form-group">
+                    <label>Product Description</label>
+                    <textarea id="prodDesc" rows="3" placeholder="Key specs and features..." class="form-input"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-check-lg"></i> Publish Product</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Coupon Modal (Admin) -->
+    <div class="modal-backdrop" id="createCouponModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('createCouponModal')"><i class="bi bi-x-lg"></i></button>
+            <h3><i class="bi bi-ticket-perforated"></i> Create Platform Coupon</h3>
+            <form id="createCouponForm" onsubmit="handleCreateCouponSubmit(event)" class="mt-3">
+                <div class="form-group">
+                    <label>Coupon Code</label>
+                    <input type="text" id="coupCode" required placeholder="SUMMER25" class="form-input uppercase">
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label>Discount Type</label>
+                        <select id="coupType" class="form-select">
+                            <option value="percent">Percentage (%)</option>
+                            <option value="fixed">Fixed Amount ($)</option>
+                        </select>
+                    </div>
+                    <div class="form-group col">
+                        <label>Discount Value</label>
+                        <input type="number" step="0.01" id="coupValue" required placeholder="15" class="form-input">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label>Min Purchase ($)</label>
+                        <input type="number" step="0.01" id="coupMin" value="50" class="form-input">
+                    </div>
+                    <div class="form-group col">
+                        <label>Max Uses</label>
+                        <input type="number" id="coupMax" value="100" class="form-input">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block"><i class="bi bi-plus-circle"></i> Save Coupon</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification System -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
